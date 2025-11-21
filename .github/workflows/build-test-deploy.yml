@@ -28,33 +28,42 @@ jobs:
 
   deploy:
     needs: test
+    
     permissions:
       contents: write
       pages: write
       id-token: write
+      
     environment:
       name: production
       url: ${{steps.deployment.outputs.page_url}}
+      
     runs-on: ubuntu-latest
+    
     steps:
       - name: checkout repo
-        uses: action/checkout@v6
+        uses: actions/checkout@v6
         with:
           token: ${{secrets.GITHUB_TOKEN}}
+          
       - name: setup node
-        uses: action/setup-node@v6
+        uses: actions/setup-node@v6
         with:
           node-version: '18.x'
+          
       - name: configure github pages
         uses: actions/configure-pages@v5
         with:
           static_site_generator: next
+          
       - run: npm install
       - run: npm run build
+      
       - name: upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: "./out"
+          
       - name: deploy
         id: deployment
         uses: actions/deploy-pages@v4
