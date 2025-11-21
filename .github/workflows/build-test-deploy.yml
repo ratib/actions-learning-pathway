@@ -12,3 +12,17 @@ jobs:
           node-version: '18.x'
       - run: npm install
       - run: npm run build
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout rep
+        uses: actions/checkout@v6
+      - name: use node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '18.x'
+      - run: npm install
+      - run: npm test
+    
