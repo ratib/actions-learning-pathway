@@ -1,0 +1,42 @@
+name: Deploy
+on:
+    workflow_run:
+        workflows: ["CI (Main)"]
+        types:
+            - completed
+
+jobs:
+    deploy:
+        name: deploy to github pages
+        if: ${{github.event.workflow_run.conclusion == 'success'}}
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: write
+            pages: write
+            id-token: write
+
+        environment:
+            name: production
+            url: ${{steps.deploy-pages.outputs.page_url}}
+
+        steps:
+            - name: download production artifcats
+              uses: actions/download-artifact@v4
+              with:
+                  name: production-build
+                  path: ./out
+
+            - name: Configure github pages
+              uses: actions/configure-pages@v5
+              with:
+                  static_site_generator: next
+
+            - name: upload pages artifact
+              uses: actions/upload-pages-artifact@v4
+              with:
+                  path: ./out
+
+            - name: deploy to github pages
+              id: deploy-pages
+              uses: actions/deploy-pages@v4
